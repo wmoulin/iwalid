@@ -1,0 +1,8 @@
+{
+  "javascript": {
+    "compile" : {
+      "presets": ["stage-0", "es2015"],
+      "plugins" : ["transform-decorators-legacy"]
+    }
+  }
+}
