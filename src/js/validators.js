@@ -9,16 +9,14 @@
 
 export default function validate(target) {
     if (!target.prototype.validate) {
-        target.prototype.validate = function () {
-            var _this = this;
-
-            if (this.valid) {
-                for (var attrib in this.valid) {
-                    this.valid[attrib].forEach(function (validator) {
-                        validator.bind(_this)(_this[attrib]);
-                    }, this);
+        target.prototype.validate = function() {
+            if (target.valid) {
+                for (var attrib in target.valid) {
+                    target.valid[attrib].forEach((validator) => {
+                        validator.bind(this)(this[attrib]);
+                    });
                 };
             }
         };
-    };
+    }
 };
