@@ -1,6 +1,8 @@
 "use strict";
 
 import ValidatorHelper from "../helpers/ValidatorHelper"
+import ValidatorError from "../exception/validatorError";
+import ValidatorConfigError from "../exception/validatorConfigError";
 
 
 /**
@@ -9,26 +11,17 @@ import ValidatorHelper from "../helpers/ValidatorHelper"
 */
 export default function match(pattern, param) {
   return function (target, key, descriptor) {
-    if (!key && !descriptor) { // decorateur de classe
-      ValidatorHelper.initField(target, param);
-      ValidatorHelper.applyValidatorOnProperty(target, param, testPattern, pattern);    
-    } else if (descriptor && (descriptor.get || descriptor.initializer)) { // decorateur de propriété
-      ValidatorHelper.initField(target.constructor, key);
-      ValidatorHelper.applyValidatorOnProperty(target.constructor, key, testPattern, pattern);
-    } else if (descriptor && descriptor.value) { // decorateur de fonction
-      ValidatorHelper.applyValidatorOnFunction(descriptor, param, testPattern, pattern);
-    }
+    ValidatorHelper.applyValidatorFctSwitchType(target, key, descriptor, [param], testPattern, pattern);
   };
 };
 
-function testPattern(value, msgs, pattern) {
-  if (typeof value == "undefined") {
-    throw new Error(msgs.join().replace(",", " ") + " : pattern validator error (value is undefined) !!!");
-  } else {
+function testPattern(value, descriptor, pattern) {
+  let msgError = "the value not match.";
+  if (typeof value != "undefined") {
     if (typeof value != "string") {
-      throw new Error(msgs.join().replace(",", " ") + " : pattern validator error (value is not a string) !!!");
-    } else if (!value.match(pattern)) {
-      throw new Error(msgs.join().replace(",", " ") + " : pattern validator error (value not match)!!!");
+      throw new ValidatorConfigError( "Pattern validator error (value is not a string).", descriptor);
+    } else if (!pattern.test(value)) {
+      throw new ValidatorError(msgError, descriptor);
     }
   }
 }

@@ -58,14 +58,26 @@ function validParameter(parameter) {
     if (!parameter) {
         throw new Error(parameter + " : dateValidator parameter must not be null !!!");
     } else if (!(parameter instanceof Date)) {
-        throw new Error(parameter + " : dateValidator parameter must be a date !!!");
+        throw new TypeError(parameter + " : dateValidator parameter must be a date !!!");
     }
 }
 
-function validParameter(parameter) {
+function compare(parameter) {
     if (!parameter) {
         throw new Error(parameter + " : dateValidator parameter must not be null !!!");
     } else if (!(parameter instanceof Date)) {
-        throw new Error(parameter + " : dateValidator parameter must be a date !!!");
+        throw new TypeError(parameter + " : dateValidator parameter must be a date !!!");
     }
+}
+
+function compareDate(value, msgs, date) {
+  if (typeof value == "undefined") {
+    throw new Error(msgs.join().replace(",", " ") + " : pattern validator error (value is undefined) !!!");
+  } else {
+    if (typeof value != "string") {
+      throw new Error(msgs.join().replace(",", " ") + " : pattern validator error (value is not a string) !!!");
+    } else if (!value.match(pattern)) {
+      throw new Error(msgs.join().replace(",", " ") + " : pattern validator error (value not match)!!!");
+    }
+  }
 }

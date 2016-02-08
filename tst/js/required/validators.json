@@ -1,0 +1,17 @@
+{
+  "__validator__": {
+    "__instance__": ["required"],
+    "__properties__" : {
+      "name": ["required"],
+      "password": [{"name": "notEmpty"}],
+      "contact": {
+        "__validator__": {
+          "__instance__": ["required"],
+          "__properties__" : {
+            "email": ["notEmpty"]
+          }
+        }
+      }
+    }
+  }
+}

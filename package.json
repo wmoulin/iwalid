@@ -2,6 +2,8 @@
   "name": "js-validation",
   "version": "1.0.0",
   "description": "Module de validation",
-  "dependencies": {  },
+  "dependencies": {
+    "bluebird": "^3.2.1"
+  },
   "author": "wilfried Moulin"
 }
