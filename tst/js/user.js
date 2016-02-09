@@ -1,11 +1,14 @@
 "use strict";
 
-import validators from "../../src/js/validators";
-var _dateValidators = require("../../src/js/validators/dateValidators");
-var _requiredValidators = require("../../src/js/validators/requiredValidators");
+import validate from "../../src/js/validators";
+import dateValidators from "../../src/js/validators/dateValidators";
+import * as requiredValidators from "../../src/js/validators/requiredValidators";
 
-@validators.validate
+@validate()
+@requiredValidators.required({propName: "name"})
+@requiredValidators.required({propName: "password"})
 class User {
+
   constructor(name, password) {
     this.name = name;
     this.password = password;

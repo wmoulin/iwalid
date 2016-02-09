@@ -1,20 +1,22 @@
 "use strict";
 import path from "path";
-import fs from 'fs';
+import fs from "fs";
+import ValidatorConfiguration from "../validatorConfiguration";
+import ValidatorConfigError from "../exception/validatorConfigError";
 
 export default class ValidatorHelper {
   /**
   * Ajout les attributs nécessaires au module de validation.
-  * @param {target} instance de l'objet à valider.
-  * @param {key} nom de l'attribut concerné par la validation.
+  * @param {function} targetClass - constructeur de l'objet à valider.
+  * @param {string} key - nom de l'attribut concerné par la validation.
   */
   static initField(target, key) {
-    if (!target.valid) {
-      target.valid = {};
+    if (!target.__validation__) {
+      target.__validation__ = {};
     }
-    
-    if (!target.valid[key]) {
-      target.valid[key] = [];
+
+    if (!target.__validation__[key]) {
+      target.__validation__[key] = [];
     }
   }
 
@@ -23,50 +25,82 @@ export default class ValidatorHelper {
   * @param {String} chemin du fichier
   * @return {Object} l'objet Json dans le fichier
   */
-
   static loadJsonFile(jsonFile) {
     if (fs.existsSync(jsonFile)) {
       return require(jsonFile);
     }
   }
-  
+
   /**
-  * Ajout les attributs nécessaires au module de validation.
-  * @param {target} instance de l'objet à valider.
-  * @param {key} nom de l'attribut concerné par la validation.
-  * @param {fctToCall} fonction à appeler pour la validation de l'attribut.
-  * @param {extraParameters} complément de paramètres pour la fonction.
+  * Ajout un validateur sur une propriété de classe ou un function.
+  * @param {Object|function} target - instance ou constructeur de l'objet à valider .
+  * @param {?string} key - nom de l'attribut concerné par la validation.
+  * @param {?Object} descriptor - descripteur de la propriété (attribut / fonction).
+  * @param {?Object} decoArgs - paramètres passer au décorateur.
+  * @param {!function} fctToCall - fonction à appeler pour la validation.
+  * @param {?...extraParameters} extraParameters - complément de paramètres pour la fonction.
+  * @throws {ValidatorConfigError} Type de decorateur impossible à déduire.
   */
-  static applyValidatorOnProperty(targetClass, key, fctToCall, ...extraParameters) {
-    targetClass.valid[key].push(function (value) {
-      var argsForFctToCall = [value, [key]];
+  static applyValidatorFctSwitchType(target, key, descriptor, decoArgs, fctToCall, ...extraParameters) {
+
+    let description = !decoArgs ? new ValidatorConfiguration({}) : decoArgs instanceof ValidatorConfiguration ? decoArgs : new ValidatorConfiguration(decoArgs);
+    description.propName = key || description.propName;
+
+    if (target && !key) { // decorateur de classe
+      ValidatorHelper.initField(target, description.propName);
+      ValidatorHelper.applyValidatorOnProperty(target, description.propName, description, fctToCall, extraParameters);
+    } else if (target && key && !descriptor) { // config externe
+      ValidatorHelper.initField(target.constructor, key);
+      ValidatorHelper.applyValidatorOnProperty(target.constructor, key, description, fctToCall, extraParameters);
+    } else if (target && key && descriptor && (descriptor.get || descriptor.initializer)) { // decorateur de propriété
+      ValidatorHelper.initField(target.constructor, key);
+      ValidatorHelper.applyValidatorOnProperty(target.constructor, key, description, fctToCall, extraParameters);
+    } else if (descriptor && descriptor.value) { // decorateur de fonction
+      if (typeof description.index == "undefined") {
+        console.log(description);
+        throw new ValidatorConfigError("Index undefined (Function Decorator).", description);
+      }
+      ValidatorHelper.applyValidatorOnFunction(descriptor, description, fctToCall, extraParameters);
+    } else {
+      throw new ValidatorConfigError("Unknow type of Decorator to apply.", description);
+    }
+  }
+
+  /**
+  * Ajout un validateur sur une propriété de classe.
+  * @param {function} targetClass - constructeur de l'objet à valider.
+  * @param {string} key - nom de l'attribut concerné par la validation.
+  * @param {?ValidatorConfiguration} description - paramètres passer au décorateur.
+  * @param {function} fctToCall - fonction à appeler pour la validation de l'attribut.
+  * @param {...extraParameters} extraParameters - complément de paramètres pour la fonction.
+  */
+  static applyValidatorOnProperty(targetClass, key, description, fctToCall, extraParameters) {
+    targetClass.__validation__[key].push(function (value) {
+      var argsForFctToCall = [value, description];
       if (extraParameters) {
         argsForFctToCall = argsForFctToCall.concat(extraParameters);
       }
       fctToCall.apply(this.caller, argsForFctToCall);
     });
   }
-  
+
   /**
-  * Ajout les attributs nécessaires au module de validation.
-  * @param {descriptor} descripteur de la fonction.
-  * @param {paramIdxs} tableau des indexes des paramètres concerné par le décorateur.
-  * @param {fctToCall} fonction à appeler pour chaque paramètre.
-  * @param {extraParameters} complément de paramètres pour la fonction.
+  * Ajout un validateur sur les paramètres d'une fonction.
+  * @param {Object} descriptor - descripteur de la fonction.
+  * @param {?ValidatorConfiguration} description - paramètres passer au décorateur.
+  * @param {function} fctToCall - fonction à appeler pour chaque paramètre.
+  * @param {...extraParameters} extraParameters - complément de paramètres pour la fonction.
   */
-  static applyValidatorOnFunction(descriptor, paramIdxs, fctToCall, extraParameters) {
+  static applyValidatorOnFunction(descriptor, description, fctToCall, extraParameters) {
     let oldFunct = descriptor.value;
     descriptor.value = function() {
-      paramIdxs.forEach((paramIdx) => {
-        var argsForFctToCall = [arguments[paramIdx], ["paramter index", paramIdxs]];
-        if (extraParameters) {
-          argsForFctToCall = argsForFctToCall.concat(extraParameters);
-        }
-        fctToCall.apply(this.caller, argsForFctToCall);
-      });
+      var argsForFctToCall = [arguments[description.index], description];
+      if (extraParameters) {
+        argsForFctToCall = argsForFctToCall.concat(extraParameters);
+      }
+      fctToCall.apply(this.caller, argsForFctToCall);
       return oldFunct.apply(this.caller, arguments);
     };
+  }
 
-  }  
 };
-
