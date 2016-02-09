@@ -1,6 +1,5 @@
 "use strict";
 
-
 /*
 * @param {?string} message - message de l'erreur.
 * @param {?Object} descriptor - descripteur de la validation.
@@ -13,6 +12,6 @@ export default function ValidatorError(message, descriptor) {
   this.name = "ValidatorError";
   this.descriptor = desc;
   Error.captureStackTrace(this, ValidatorError);
-}
+};
 ValidatorError.prototype = Object.create(Error.prototype);
 ValidatorError.prototype.constructor = ValidatorError;

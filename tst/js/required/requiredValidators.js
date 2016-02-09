@@ -23,7 +23,6 @@ describe("Validation d'attribut obligatoire", function () {
 
 describe("Validation d'attribut obligatoire externalisée", function () {
   describe("User validation externalisée", function () {
-
     it("external", function () {
       var confExt = JSON.parse(fs.readFileSync( __dirname + "/validators.json", 'utf8'));
       var user = new User("name", "password");

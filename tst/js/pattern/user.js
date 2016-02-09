@@ -6,14 +6,12 @@ import * as requiredValidators from "../../../src/js/validators/requiredValidato
 
 @validate()
 class User {
-
   @requiredValidators.required()
   name = "";
 
   @patternValidator(/^[0-9]+$/)
   @requiredValidators.notEmpty()
   password = "";
-
   constructor(name, password) {
     this.name = name;
     this.password = password;
