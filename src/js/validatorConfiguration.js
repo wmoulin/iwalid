@@ -6,11 +6,10 @@ export default class ValidatorConfiguration {
 
     this.index = undefined;
     this.propName = undefined;
-    this.fieldId = undefined;
-    this.messageId = undefined;
-    this.message = undefined;
     this.stopOnError = false;
     this.nextOnError = false;
+    this.message = false;
+    this.extra = undefined;
 
     if (obj) {
       for (var prop in this) this[prop] = obj[prop];

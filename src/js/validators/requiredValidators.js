@@ -29,14 +29,14 @@ export function notEmpty(description) {
 };
 
 function testUndefined(value, description) {
-  let msgError = "the value is undefined.";
+  let msgError = description.message || "the value is undefined.";
   if (typeof value == "undefined") {
     throw new ValidatorError(msgError, description);
   }
 }
 
 function testNotEmpty(value, description) {
-  let msgError = "the value is empty or undefined.";
+  let msgError = description.message || "the value is empty or undefined.";
   if (typeof value == "undefined") {
     throw new ValidatorError(msgError, description);
   } else {

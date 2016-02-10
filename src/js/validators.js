@@ -14,19 +14,24 @@ import ValidatorLoader from "./validators-loader";
 
 /**
 * Decorateur pour ajouter le méthode de point d'entrée du module de validation
-* param {Object} configuration - configuration globale de validation
 */
 export default function validate() {
   return function(target) {
 
     if (!target.prototype.__validate__) {
       target.prototype.__validate__ = function(configuration, errors) {
-        let config = configuration || ValidatorLoader.globalConf;
+        let config = configuration || ValidatorLoader.globalConf || {};
         let errs = errors || [];
         try {
           let childsValidate = [];
           if (target.__validation__) {
             for (var attrib in target.__validation__) {
+              if (!Object.getOwnPropertyDescriptor(this, attrib)) {
+                console.log("entries", Object.entries(this));
+                console.log("descriptor", Object.getOwnPropertyDescriptor(this, attrib));
+                console.log("value", attrib, this[attrib]);
+                continue;
+              }
               if (this[attrib] && this[attrib].__validate__ && typeof this[attrib].__validate__ === "function") {
                 childsValidate.push(attrib);
               }
@@ -47,7 +52,7 @@ export default function validate() {
               }
             }
             for (var attrib in childsValidate) {
-              this[childsValidate[attrib]].__validate__.bind(this[childsValidate[attrib]])(configuration, errs);
+              this[childsValidate[attrib]].__validate__.bind(this[childsValidate[attrib]])(config, errs);
             }
             if (errs && Array.isArray(errs) && errs.length > 0) {
               throw new ValidationError(errs);
@@ -72,10 +77,14 @@ export function validatePromise() {
     if (!target.prototype.__validatePromise__) {
       target.prototype.__validatePromise__ = function (rejectFct, configuration) {
         this.__errors__ = [];
+        let config = configuration || ValidatorLoader.globalConf || {};
         let p = Promise.resolve(true);
         let childsValidate = [];
         if (target.__validation__) {
           for (var attrib in target.__validation__) {
+            if (!Object.getOwnPropertyDescriptor(this, attrib)) {
+              continue;
+            }
             if (this[attrib] && this[attrib].__validate__ && typeof this[attrib].__validate__ === "function") {
               childsValidate.push(attrib);
             }

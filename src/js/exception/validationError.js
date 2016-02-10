@@ -1,21 +1,18 @@
 "use strict";
 
-export default class ValidatorError extends Error {
+/*
+* Erreur lancé lors en fin de validation et regroupant toutes les erreurs de validation
+* @param {?string} message - message de l'erreur.
+* @param {Array} errors - listes des erreurs de validation.
+*/
+export default function ValidationError(message, errors) {
+  let msg = typeof message === "string" ? message : "Error during validation";
+  let errs = errors && typeof message === "string" ? errors : !errors && typeof message !== "string" ? message : [];
 
-  descriptor;
-
-  /*
-  * @param {?string} message - message de l'erreur.
-  * @param {?Object} errors - tableau d'erreurs de validation.
-  */
-  constructor(message, errors) {
-
-    let msg = typeof message === "string" ? message : "Error during validation";
-    let errs = errors && typeof message === "string" ? errors : !errors && typeof message !== "string" ? message : {};
-
-    super(msg);
-    this.name = "ValidationError";
-    this.errors = errs;
-  }
-
+  this.message = msg;
+  this.name = "ValidationError";
+  this.errors = errs;
+  Error.captureStackTrace(this, ValidationError);
 };
+ValidationError.prototype = Object.create(Error.prototype);
+ValidationError.prototype.constructor = ValidationError;

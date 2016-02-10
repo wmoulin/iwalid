@@ -39,6 +39,14 @@ export default class ValidMod {
     ValidMod.validators = validators;
   }
 
+
+  /**
+  * Charge les validateurs pour les utiliser lors d'une validation avec config externe.
+  */
+  static initGlobalConfiguration() {
+    ValidMod.globalConf = undefined;
+  }
+
   /**
   * Charge une configuration externe de validation, sauvegarde l'ancienne pour la restituer.
   * @param {Object} conf - description des validateur à appliquer.

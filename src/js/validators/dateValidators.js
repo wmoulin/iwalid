@@ -1,83 +1,90 @@
 "use strict";
 
-export function after(date) {
-    var orEquals = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
 
-    validParameter(date);
-    return function (target, key, descriptor) {
-        FieldValidator.initField(target, key);
-        target.valid[key].push(function (value) {
-            if (!value) {
-                throw new Error(key + " : required validator error !!!");
-            } else {
-                if (!(value instanceof Date)) {
-                    throw new Error(key + " : dateValidator.after validator only for date !!!");
-                } else if (!orEquals && date.getTime() > value.getTime() || date.getTime() >= value.getTime()) {
-                    throw new Error(key + " : required validator error !!!");
-                }
-            }
-        });
-    };
+export function equal(date) {
+  validParameter(date);
+  return function (target, key, descriptor) {
+    ValidatorHelper.applyValidatorFctSwitchType(target, key, descriptor, description, compareDate, date, 1);
+  };
+};
+
+export function after(date) {
+  validParameter(date);
+  return function (target, key, descriptor) {
+    ValidatorHelper.applyValidatorFctSwitchType(target, key, descriptor, description, compareDate, date, 2);
+  };
+};
+
+export function afterOrEqual(date) {
+  validParameter(date);
+  return function (target, key, descriptor) {
+    ValidatorHelper.applyValidatorFctSwitchType(target, key, descriptor, description, compareDate, date, 3);
+  };
 };
 
 export function before(date) {
-    var orEquals = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
-
-    validParameter(date);
-    return function (target, key, descriptor) {
-        FieldValidator.initField(target, key);
-        target.valid[key].push(function (value) {
-            if (!value) {
-                throw new Error(key + " : required validator error !!!");
-            } else {
-                if (!(value instanceof Date)) {
-                    throw new Error(key + " : dateValidator.after validator only for date !!!");
-                } else if (!orEquals && date.getTime() < value.getTime() || date.getTime() <= value.getTime()) {
-                    throw new Error(key + " : required validator error !!!");
-                }
-            }
-        });
-    };
+  validParameter(date);
+  return function (target, key, descriptor) {
+    ValidatorHelper.applyValidatorFctSwitchType(target, key, descriptor, description, compareDate, date, -2);
+  };
 };
 
-export function before(date, param) {
+export function beforeOrEqual(date) {
+  validParameter(date);
   return function (target, key, descriptor) {
-    if (!key && !descriptor) { // decorateur de classe
-      ValidatorHelper.initField(target, param);
-      ValidatorHelper.applyValidatorOnProperty(target, param, testPattern, pattern);    
-    } else if (descriptor && (descriptor.get || descriptor.initializer)) { // decorateur de propriété
-      ValidatorHelper.initField(target.constructor, key);
-      ValidatorHelper.applyValidatorOnProperty(target.constructor, key, testPattern, pattern);
-    } else if (descriptor && descriptor.value) { // decorateur de fonction
-      ValidatorHelper.applyValidatorOnFunction(descriptor, param, testPattern, pattern);
-    }
+    ValidatorHelper.applyValidatorFctSwitchType(target, key, descriptor, description, compareDate, date, -1);
   };
 };
 
 function validParameter(parameter) {
     if (!parameter) {
-        throw new Error(parameter + " : dateValidator parameter must not be null !!!");
+        throw new ValidatorConfigError(parameter + " : dateValidator parameter must not be null !!!");
     } else if (!(parameter instanceof Date)) {
-        throw new TypeError(parameter + " : dateValidator parameter must be a date !!!");
+        throw new ValidatorConfigError(parameter + " : dateValidator parameter must be a date !!!");
     }
 }
 
-function compare(parameter) {
-    if (!parameter) {
-        throw new Error(parameter + " : dateValidator parameter must not be null !!!");
-    } else if (!(parameter instanceof Date)) {
-        throw new TypeError(parameter + " : dateValidator parameter must be a date !!!");
-    }
-}
+/**
+* Methode appelée par le comparateur de validation de date
+* {Object} value - valeur de l'attribut à valider
+* {Object} description - description de la validation
+* {Date} date - valeur de comparaison
+* {int} operator - valeur representation l'operator à appliquer
+*       -2 <, -1 <=, 1 =, 2 >, 3 >=
+*/
+function compareDate(value, description, date, operator=0) {
+  let messages = {
+    "-2": "Date validator error (value must be lower or equal).",
+    "-1": "Date validator error (value must be lower).",
+    "1": "Date validator error (value must equal).",
+    "2": "Date validator error (value must be greater).",
+    "3": "Date validator error (value must be greater or equal)."
+  };
+  let msgError = description.message || messages[operator];
 
-function compareDate(value, msgs, date) {
   if (typeof value == "undefined") {
-    throw new Error(msgs.join().replace(",", " ") + " : pattern validator error (value is undefined) !!!");
+    throw new ValidatorError(msgError, description);
   } else {
     if (typeof value != "string") {
-      throw new Error(msgs.join().replace(",", " ") + " : pattern validator error (value is not a string) !!!");
-    } else if (!value.match(pattern)) {
-      throw new Error(msgs.join().replace(",", " ") + " : pattern validator error (value not match)!!!");
+      throw new ValidatorConfigError( "Date validator error (value is not a date).", description);
+    } else if (!operator || operator || isNaN(operator) || operator < 3 || operator > 2 || operator == 0) {
+      throw new ValidatorConfigError( "Date validator error (bad operator value).", description);
+    } else {
+      if (operator < 0) {
+        if (operator == -2 && date.getTime() > value.getTime()) {
+          throw new ValidatorError(msgError, description);
+        } else if (operator == -1 && date.getTime() >= value.getTime()) {
+          throw new ValidatorError(msgError, description);
+        }
+      } else if (operator > 1) {
+        if (operator == 3 && date.getTime() < value.getTime()) {
+          throw new ValidatorError(msgError, description);
+        } else if (operator == 2 && date.getTime() <= value.getTime()) {
+          throw new ValidatorError(msgError, description);
+        }
+      } else if (date.getTime() == value.getTime()) {
+        throw new ValidatorError(msgError, description);
+      }
     }
   }
 }

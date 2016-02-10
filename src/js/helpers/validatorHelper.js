@@ -7,16 +7,17 @@ import ValidatorConfigError from "../exception/validatorConfigError";
 export default class ValidatorHelper {
   /**
   * Ajout les attributs nécessaires au module de validation.
-  * @param {function} targetClass - constructeur de l'objet à valider.
-  * @param {string} key - nom de l'attribut concerné par la validation.
+  * @param {Object} target - Classe cible du décorateur.
+  * @param {ValidatorConfiguration} description - description du décorateur.
   */
-  static initField(target, key) {
+  static initField(target, description) {
+
     if (!target.__validation__) {
       target.__validation__ = {};
     }
 
-    if (!target.__validation__[key]) {
-      target.__validation__[key] = [];
+    if (!target.__validation__[description.propName]) {
+      target.__validation__[description.propName] = [];
     }
   }
 
@@ -46,15 +47,21 @@ export default class ValidatorHelper {
     let description = !decoArgs ? new ValidatorConfiguration({}) : decoArgs instanceof ValidatorConfiguration ? decoArgs : new ValidatorConfiguration(decoArgs);
     description.propName = key || description.propName;
 
+    if (target && key && descriptor.get && descriptor.set) {
+      if (!Object.getOwnPropertyDescriptor(target, description.propName)) {
+        throw new ValidatorConfigError("key undefined in Object (Class or Property Decorator).", description);
+      }
+    }
+
     if (target && !key) { // decorateur de classe
-      ValidatorHelper.initField(target, description.propName);
-      ValidatorHelper.applyValidatorOnProperty(target, description.propName, description, fctToCall, extraParameters);
+      ValidatorHelper.initField(target, description);
+      ValidatorHelper.applyValidatorOnProperty(target, description, fctToCall, extraParameters);
     } else if (target && key && !descriptor) { // config externe
-      ValidatorHelper.initField(target.constructor, key);
-      ValidatorHelper.applyValidatorOnProperty(target.constructor, key, description, fctToCall, extraParameters);
+      ValidatorHelper.initField(target.constructor, description);
+      ValidatorHelper.applyValidatorOnProperty(target.constructor, description, fctToCall, extraParameters);
     } else if (target && key && descriptor && (descriptor.get || descriptor.initializer)) { // decorateur de propriété
-      ValidatorHelper.initField(target.constructor, key);
-      ValidatorHelper.applyValidatorOnProperty(target.constructor, key, description, fctToCall, extraParameters);
+      ValidatorHelper.initField(target.constructor, description);
+      ValidatorHelper.applyValidatorOnProperty(target.constructor, description, fctToCall, extraParameters);
     } else if (descriptor && descriptor.value) { // decorateur de fonction
       if (typeof description.index == "undefined") {
         console.log(description);
@@ -69,13 +76,12 @@ export default class ValidatorHelper {
   /**
   * Ajout un validateur sur une propriété de classe.
   * @param {function} targetClass - constructeur de l'objet à valider.
-  * @param {string} key - nom de l'attribut concerné par la validation.
-  * @param {?ValidatorConfiguration} description - paramètres passer au décorateur.
+  * @param {ValidatorConfiguration} description - description du décorateur.
   * @param {function} fctToCall - fonction à appeler pour la validation de l'attribut.
   * @param {...extraParameters} extraParameters - complément de paramètres pour la fonction.
   */
-  static applyValidatorOnProperty(targetClass, key, description, fctToCall, extraParameters) {
-    targetClass.__validation__[key].push(function (value) {
+  static applyValidatorOnProperty(targetClass, description, fctToCall, extraParameters) {
+    targetClass.__validation__[description.propName].push(function (value) {
       var argsForFctToCall = [value, description];
       if (extraParameters) {
         argsForFctToCall = argsForFctToCall.concat(extraParameters);
