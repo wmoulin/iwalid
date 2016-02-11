@@ -1,10 +1,10 @@
 "use strict";
 
-import {validatePromise} from "../../../src/js/validators";
+import validate from "../../../src/js/validators";
 import * as requiredValidators from "../../../src/js/validators/requiredValidators";
 import Contact from "./contact";
 
-@validatePromise()
+@validate()
 class User {
 
   @requiredValidators.required()

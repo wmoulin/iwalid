@@ -2,7 +2,6 @@
 import * as Validate from "./validators";
 import patternValidators from "./validators/patternValidators";
 import * as requiredValidators from "./validators/requiredValidators";
-import ValidatorHelper from "./helpers/ValidatorHelper"
 
 const validatorKey = "__validator__";
 const validatorInstanceKey = "__instance__";
@@ -11,22 +10,6 @@ const validatorPropertiesKey = "__properties__";
 export default class ValidMod {
 
   constructor() {
-  }
-
-  /**
-  * Lance la validation à partir d'un objet de validation.
-  * @param {instance} objet à valider.
-  * @param {validation} description des validateur à appliquer.
-  */
-  static validate(instance, validation) {
-
-    let validToApply = validation || instance.__validation__;
-
-    for (var attrib in validToApply) {
-      validToApply[attrib].forEach((validator) => {
-        validator.bind(target)(target[attrib]);
-      });
-    }
   }
 
   /**
@@ -39,6 +22,17 @@ export default class ValidMod {
     ValidMod.validators = validators;
   }
 
+
+  /**
+  * Ajoute des validateurs pour les utiliser lors d'une validation avec config externe.
+  */
+  static addValidators(validators) {
+    if (validators && Array.isArray(validators)) {
+      let externalValidators = {};
+      validators.forEach((validator) => {externalValidators = Object.assign(externalValidators, loadValidators(validator));});
+      Object.assign(ValidMod.validators, externalValidators);
+    }
+  }
 
   /**
   * Charge les validateurs pour les utiliser lors d'une validation avec config externe.
@@ -61,11 +55,8 @@ export default class ValidMod {
 
     if (typeof conf == "object" && conf[validatorKey]) {
 
-      if (!target.constructor.__validate__) {
-        ValidMod.validators["validate"]()(target.constructor);
-      }
-      if (!target.constructor.__validatePromise__) {
-        ValidMod.validators["validatePromise"]()(target.constructor);
+      if (!target.validate) {
+        ValidMod.validators["validate"](conf[validatorKey].modePromise)(target.constructor);
       }
 
       let validators = conf[validatorKey];
@@ -77,7 +68,8 @@ export default class ValidMod {
       if (validators[validatorPropertiesKey]) {
         for(var propertyToValidate in validators[validatorPropertiesKey]) {
 
-        if (typeof validators[validatorPropertiesKey][propertyToValidate] == "object" && !Array.isArray(validators[validatorPropertiesKey][propertyToValidate])) {
+          if (typeof validators[validatorPropertiesKey][propertyToValidate] == "object" && !Array.isArray(validators[validatorPropertiesKey][propertyToValidate])) {
+            validators[validatorPropertiesKey][propertyToValidate][validatorKey].modePromise = conf[validatorKey].modePromise;
             ValidMod.applyExternalConfValidator(validators[validatorPropertiesKey][propertyToValidate], target[propertyToValidate], target, propertyToValidate);
           } else if (Array.isArray(validators[validatorPropertiesKey][propertyToValidate])) {
             addArrayValidators(target, propertyToValidate, validators[validatorPropertiesKey][propertyToValidate]);

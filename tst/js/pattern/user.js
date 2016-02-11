@@ -4,7 +4,7 @@ import validate from "../../../src/js/validators";
 import patternValidator from "../../../src/js/validators/patternValidators";
 import * as requiredValidators from "../../../src/js/validators/requiredValidators";
 
-@validate()
+@validate(false)
 class User {
   @requiredValidators.required()
   name = "";

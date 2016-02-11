@@ -1,14 +1,17 @@
 "use strict";
 
 import {validateCallFct} from "../../src/js/validators";
-import dateValidators from "../../src/js/validators/dateValidators";
+import patternValidator from "../../src/js/validators/patternValidators";
 import * as requiredValidators from "../../src/js/validators/requiredValidators";
 
 @validateCallFct()
-@requiredValidators.required({propName: "name"})
-@requiredValidators.required({propName: "password"})
 export default class User {
+  @requiredValidators.required()
+  name = "";
 
+  @patternValidator(1)
+  @requiredValidators.notEmpty()
+  password = "";
   constructor(name, password) {
     this.name = name;
     this.password = password;

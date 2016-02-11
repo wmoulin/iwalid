@@ -13,20 +13,49 @@ import ValidatorLoader from "./validators-loader";
  */
 
 /**
-* Decorateur pour ajouter le méthode de point d'entrée du module de validation
+* Decorateur pour ajouter le méthode de point d'entrée du module de validation.
+* Cette méthode pourra renvoyer une suite de Promise ou fera appel au différents validateurs directement.
+* @param {boolean} [promiseMode=true] - Active / Désactive le mode promise.
 */
-export default function validate() {
+export default function validate(promiseMode=true) {
+  if (promiseMode) {
+    return validatePromise();
+  }
+  return validateFct();
+
+};
+
+
+/**
+* Decorateur pour ajouter le méthode de point d'entrée du module de validation.
+* Cette méthode fera appel au différents validateurs directement.
+* @param {boolean} [promiseMode=true] - Active / Désactive le mode promise.
+*/
+export function validateCallFct() {
+  return validateFct();
+};
+
+/**
+* Decorateur pour ajouter le méthode de point d'entrée du module de validation.
+* Cette renverra une suite de Promise.
+* @param {boolean} [promiseMode=true] - Active / Désactive le mode promise.
+*/
+export function validateWithPromise() {
+  return validatePromise();
+};
+
+function validateFct() {
   return function(target) {
 
-    if (!target.prototype.__validate__) {
-      target.prototype.__validate__ = function(configuration, errors) {
+    if (!target.prototype.validate) {
+      target.prototype.validate = function(configuration, errors) {
         let config = configuration || ValidatorLoader.globalConf || {};
         let errs = errors || [];
         try {
           let childsValidate = [];
           if (target.__validation__) {
             for (var attrib in target.__validation__) {
-              if (this[attrib] && this[attrib].__validate__ && typeof this[attrib].__validate__ === "function") {
+              if (this[attrib] && this[attrib].validate && typeof this[attrib].validate === "function") {
                 childsValidate.push(attrib);
               }
               try {
@@ -46,7 +75,7 @@ export default function validate() {
               }
             }
             for (var attrib in childsValidate) {
-              this[childsValidate[attrib]].__validate__.bind(this[childsValidate[attrib]])(config, errs);
+              this[childsValidate[attrib]].validate.bind(this[childsValidate[attrib]])(config, errs);
             }
             if (errs && Array.isArray(errs) && errs.length > 0) {
               throw new ValidationError(errs);
@@ -62,21 +91,17 @@ export default function validate() {
   };
 };
 
-
-/**
-* Permet de promisifier la validation
-*/
-export function validatePromise() {
+function validatePromise() {
   return function(target) {
-    if (!target.prototype.__validatePromise__) {
-      target.prototype.__validatePromise__ = function (rejectFct, configuration) {
+    if (!target.prototype.validate) {
+      target.prototype.validate = function (rejectFct, configuration) {
         this.__errors__ = [];
         let config = configuration || ValidatorLoader.globalConf || {};
         let p = Promise.resolve(true);
         let childsValidate = [];
         if (target.__validation__) {
           for (var attrib in target.__validation__) {
-            if (this[attrib] && this[attrib].__validate__ && typeof this[attrib].__validate__ === "function") {
+            if (this[attrib] && this[attrib].validate && typeof this[attrib].validate === "function") {
               childsValidate.push(attrib);
             }
             target.__validation__[attrib].forEach((validator) => {
@@ -98,11 +123,11 @@ export function validatePromise() {
             });
           }
           for (var attrib in childsValidate) {
-            p = p.then(() => {return this[childsValidate[attrib]].__validatePromise__.bind(this[childsValidate[attrib]])();})
+            p = p.then(() => {return this[childsValidate[attrib]].validate.bind(this[childsValidate[attrib]])();})
           }
         }
         p = p.finally(()=>{
-          target.__validatePromise__ = target.__prevValidation__;
+          target.__validation__ = target.__prevValidation__;
           if (this.__errors__ && Array.isArray(this.__errors__) && this.__errors__.length > 0) {
             let ex = new ValidationError(this.__errors__);
             delete this.__errors__;
@@ -111,6 +136,11 @@ export function validatePromise() {
         });
         if (rejectFct) {
           p = p.catch(rejectFct);
+        } else {
+           p = p.catch((e) => {
+              console.err(e);
+            }
+          );
         }
 
         return p;

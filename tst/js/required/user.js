@@ -1,10 +1,10 @@
 "use strict";
 
-import validate from "../../../src/js/validators";
+import {validateCallFct} from "../../../src/js/validators";
 import * as requiredValidators from "../../../src/js/validators/requiredValidators";
 import Contact from "./contact";
 
-@validate()
+@validateCallFct()
 class User {
 
   @requiredValidators.required()

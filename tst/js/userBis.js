@@ -1,10 +1,10 @@
 "use strict";
 
-import validate from "../../src/js/validators";
+import {validateCallFct} from "../../src/js/validators";
 import * as requiredValidators from "../../src/js/validators/requiredValidators";
 
-@validate()
-class UserBis {
+@validateCallFct()
+export default class UserBis {
 
   constructor(name, password) {
     this.name = name;
@@ -19,6 +19,4 @@ class UserBis {
   get password() { return this._password};
   set password(value) { this._password = value};
 
-}
-
-module.exports = UserBis;
+};

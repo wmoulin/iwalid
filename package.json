@@ -1,9 +1,14 @@
 {
-  "name": "js-validation",
-  "version": "1.0.0",
-  "description": "Module de validation",
+  "name": "iwalid",
+  "version": "0.0.1",
+  "description": "Validation module based on decorator",
   "dependencies": {
     "bluebird": "^3.2.1"
   },
-  "author": "wilfried Moulin"
+  "author": "wilfried Moulin",
+  "repository" : {
+    "type" : "git",
+    "git": "https://github.com/wmoulin/iwalid.git"
+  },
+  "main": "iwalid.js"
 }

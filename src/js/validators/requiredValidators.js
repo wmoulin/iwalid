@@ -1,6 +1,6 @@
 "use strict";
 
-import ValidatorHelper from "../helpers/ValidatorHelper";
+import ValidatorHelper from "../helpers/validatorHelper";
 import ValidatorError from "../exception/validatorError";
 import ValidatorConfigError from "../exception/validatorConfigError";
 

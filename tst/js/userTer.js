@@ -1,11 +1,11 @@
 "use strict";
 
-import validate from "../../src/js/validators";
+import {validateCallFct} from "../../src/js/validators";
 import patternValidators from "../../src/js/validators/patternValidators";
 import * as requiredValidators from "../../src/js/validators/requiredValidators";
 
-@validate()
-class UserTer {
+@validateCallFct()
+export default class UserTer {
 
   @requiredValidators.required({message: "le nom est obligatoire", stopOnError: false, nextOnError: true})
   name = "";
@@ -22,6 +22,5 @@ class UserTer {
   test(param) {
     return param;
   }
-}
 
-module.exports = UserTer;
+};

@@ -1,5 +1,6 @@
 {
   "__validator__": {
+    "modePromise": false,
     "__instance__": ["required"],
     "__properties__" : {
       "name": ["required"],

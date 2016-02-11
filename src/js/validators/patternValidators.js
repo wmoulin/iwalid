@@ -1,6 +1,6 @@
 "use strict";
 
-import ValidatorHelper from "../helpers/ValidatorHelper"
+import ValidatorHelper from "../helpers/validatorHelper";
 import ValidatorError from "../exception/validatorError";
 import ValidatorConfigError from "../exception/validatorConfigError";
 
@@ -26,9 +26,11 @@ function testPattern(value, description, pattern) {
   let msgError = description.message || "the value not match to the pattern.";
   if (typeof value != "undefined") {
     if (typeof value != "string") {
-      throw new ValidatorConfigError( "Pattern validator error (value is not a string).", descriptor);
+      throw new ValidatorConfigError( "Pattern validator error (value is not a string).", description);
+    } else if (!pattern || typeof pattern != "object" || !pattern.test) {
+      throw new ValidatorConfigError( "Pattern validator error (pattern is not a string pattern).", description);
     } else if (!pattern.test(value)) {
-      throw new ValidatorError(msgError, descriptor);
+      throw new ValidatorError(msgError, description);
     }
   }
 }

@@ -4,7 +4,12 @@ import fs from "fs";
 import ValidatorConfiguration from "../validatorConfiguration";
 import ValidatorConfigError from "../exception/validatorConfigError";
 
+
 export default class ValidatorHelper {
+
+  constructor() {
+  }
+
   /**
   * Ajout les attributs nécessaires au module de validation.
   * @param {Object} target - Classe cible du décorateur.
@@ -58,7 +63,6 @@ export default class ValidatorHelper {
       ValidatorHelper.applyValidatorOnProperty(target.constructor, description, fctToCall, extraParameters);
     } else if (descriptor && descriptor.value) { // decorateur de fonction
       if (typeof description.index == "undefined") {
-        console.log(description);
         throw new ValidatorConfigError("Index undefined (Function Decorator).", description);
       }
       ValidatorHelper.applyValidatorOnFunction(descriptor, description, fctToCall, extraParameters);
@@ -102,5 +106,4 @@ export default class ValidatorHelper {
       return oldFunct.apply(this.caller, arguments);
     };
   }
-
 };

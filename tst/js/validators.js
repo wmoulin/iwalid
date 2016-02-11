@@ -1,8 +1,10 @@
 'use strict';
 
-var User = require("./user");
-var UserBis = require("./userBis");
-var UserTer = require("./userTer");
+import User from "./user";
+import UserBis from "./userBis";
+import UserTer from "./userTer";
+import UserError from "./userError";
+import ValidatorConfigError from "../../src/js/exception/validatorConfigError";
 var assert = require("assert");
 
 describe("Validation", function () {
@@ -15,47 +17,41 @@ describe("Validation", function () {
 
     it("user should be valid", function () {
       var user = new User("name", "password");
-      assert.doesNotThrow(() => user.__validate__(), Error);
+      assert.doesNotThrow(() => user.validate(), Error);
     });
 
     it("user should be invalid", function () {
       var user = new User(undefined, "password");
-      assert.throws(() => user.__validate__(), Error);
+      assert.throws(() => user.validate(), Error);
     });
   });
 
   describe("UserBis", function () {
     it("userBis should be valid", function () {
       var user = new UserBis("name", "password");
-      assert.doesNotThrow(() => user.__validate__(), Error);
+      assert.doesNotThrow(() => user.validate(), Error);
     });
 
     it("userBis should be invalid", function () {
       var user = new UserBis(undefined, "password");
-      assert.throws(() => user.__validate__(), Error);
+      assert.throws(() => user.validate(), Error);
     });
   });
 
   describe("UserTer", function () {
     it("userTer should be valid", function () {
       var user = new UserTer("name", "password");
-      try {
-      user.__validate__();
-      } catch(e) {
-      console.log(e.message);
-      }
-
-      assert.doesNotThrow(() => user.__validate__(), Error);
+      assert.doesNotThrow(() => user.validate(), Error);
     });
 
     it("userTer should be invalid (required)", function () {
       var user = new UserTer(undefined, "password");
-      assert.throws(() => user.__validate__(), Error);
+      assert.throws(() => user.validate(), Error);
     });
 
     it("userTer should be invalid (notEmpty)", function () {
       var user = new UserTer("name", "");
-      assert.throws(() => user.__validate__(), Error);
+      assert.throws(() => user.validate(), Error);
     });
 
     it("userTer parameter should be valid", function () {
@@ -69,5 +65,12 @@ describe("Validation", function () {
       assert.throws(() => user.test(), Error);
     });
 
+  });
+
+  describe("UserError", function () {
+    it("userTer should be valid", function () {
+      var user = new UserError("name", "password");
+      assert.throws(() => {user.validate();}, ValidatorConfigError);
+    });
   });
 });
