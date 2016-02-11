@@ -3,7 +3,7 @@
 import {Promise} from "bluebird";
 import ValidationError from "./exception/validationError";
 import ValidatorError from "./exception/validatorError";
-import ValidatorLoader from "./validators-loader";
+import ValidatorLoader from "./validatorsLoader";
 
 /*
  type ClassDecorator = <TFunction extends Function>(target: TFunction): TFunction | void;
