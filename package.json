@@ -10,5 +10,5 @@
     "type" : "git",
     "git": "https://github.com/wmoulin/iwalid.git"
   },
-  "main": "iwalid.js"
+  "main": "./src/js/iwalid.js"
 }

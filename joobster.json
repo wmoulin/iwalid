@@ -1,5 +1,6 @@
 {
   "javascript": {
+    "activeMap": false,
     "compile" : {
       "presets": ["es2015", "stage-1"],
       "plugins" : ["transform-decorators-legacy"]
