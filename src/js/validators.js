@@ -26,12 +26,6 @@ export default function validate() {
           let childsValidate = [];
           if (target.__validation__) {
             for (var attrib in target.__validation__) {
-              if (!Object.getOwnPropertyDescriptor(this, attrib)) {
-                console.log("entries", Object.entries(this));
-                console.log("descriptor", Object.getOwnPropertyDescriptor(this, attrib));
-                console.log("value", attrib, this[attrib]);
-                continue;
-              }
               if (this[attrib] && this[attrib].__validate__ && typeof this[attrib].__validate__ === "function") {
                 childsValidate.push(attrib);
               }
@@ -82,9 +76,6 @@ export function validatePromise() {
         let childsValidate = [];
         if (target.__validation__) {
           for (var attrib in target.__validation__) {
-            if (!Object.getOwnPropertyDescriptor(this, attrib)) {
-              continue;
-            }
             if (this[attrib] && this[attrib].__validate__ && typeof this[attrib].__validate__ === "function") {
               childsValidate.push(attrib);
             }

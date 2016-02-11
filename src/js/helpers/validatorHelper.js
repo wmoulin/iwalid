@@ -47,12 +47,6 @@ export default class ValidatorHelper {
     let description = !decoArgs ? new ValidatorConfiguration({}) : decoArgs instanceof ValidatorConfiguration ? decoArgs : new ValidatorConfiguration(decoArgs);
     description.propName = key || description.propName;
 
-    if (target && key && descriptor.get && descriptor.set) {
-      if (!Object.getOwnPropertyDescriptor(target, description.propName)) {
-        throw new ValidatorConfigError("key undefined in Object (Class or Property Decorator).", description);
-      }
-    }
-
     if (target && !key) { // decorateur de classe
       ValidatorHelper.initField(target, description);
       ValidatorHelper.applyValidatorOnProperty(target, description, fctToCall, extraParameters);
