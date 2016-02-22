@@ -71,6 +71,8 @@ function validateFct() {
                     throw new ValidationError(errs);
                   }
                   continue;
+                } else {
+                  throw e;
                 }
               }
             }

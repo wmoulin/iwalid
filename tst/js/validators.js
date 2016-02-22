@@ -68,7 +68,7 @@ describe("Validation", function () {
   });
 
   describe("UserError", function () {
-    it("userTer should be valid", function () {
+    it("userError should be valid", function () {
       var user = new UserError("name", "password");
       assert.throws(() => {user.validate();}, ValidatorConfigError);
     });
