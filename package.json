@@ -6,9 +6,12 @@
     "bluebird": "^3.2.1"
   },
   "author": "wilfried Moulin",
-  "repository" : {
-    "type" : "git",
+  "repository": {
+    "type": "git",
     "git": "https://github.com/wmoulin/iwalid.git"
   },
-  "main": "./src/js/iwalid.js"
+  "main": "./src/js/iwalid.js",
+  "devDependencies": {
+    "should": "^8.2.2"
+  }
 }

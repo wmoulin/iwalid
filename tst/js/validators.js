@@ -17,7 +17,7 @@ describe("Validation", function () {
 
     it("user should be valid", function () {
       var user = new User("name", "password");
-      assert.doesNotThrow(() => user.validate(), Error);
+      assert.doesNotThrow(() => user.validate() , Error);
     });
 
     it("user should be invalid", function () {

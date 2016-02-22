@@ -21,6 +21,10 @@ export default class ValidatorHelper {
       target.__validation__ = {};
     }
 
+    if (!target.__validationOrder__) {
+      target.__validationOrder__ = [];
+    }
+
     if (!target.__validation__[description.propName]) {
       target.__validation__[description.propName] = [];
     }
@@ -86,6 +90,7 @@ export default class ValidatorHelper {
       }
       fctToCall.apply(this.caller, argsForFctToCall);
     });
+    targetClass.__validationOrder__.splice(description && description.index != undefined ? description.index : targetClass.__validationOrder__.length, 0, {key : description.propName, validatorIdx : targetClass.__validation__[description.propName].length - 1});
   }
 
   /**

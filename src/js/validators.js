@@ -53,25 +53,25 @@ function validateFct() {
         let errs = errors || [];
         try {
           let childsValidate = [];
-          if (target.__validation__) {
-            for (var attrib in target.__validation__) {
+          if (target.__validation__ && target.__validationOrder__) {
+            for (let attrib in this) {
               if (this[attrib] && this[attrib].validate && typeof this[attrib].validate === "function") {
+                // un objet à valider a été touvé dans les attributs
                 childsValidate.push(attrib);
               }
+            }
+            for(let idx = 0; idx < target.__validationOrder__.length; idx++) {
+              let validatorDesc = target.__validationOrder__[idx]
               try {
-                target.__validation__[attrib].forEach((validator) => {
-                  validator.bind(this)(this[attrib]);
-                });
+                target.__validation__[validatorDesc.key][validatorDesc.validatorIdx].bind(this)(this[validatorDesc.key]);
               } catch (e) {
                 if (e instanceof ValidatorError && e.descriptor) {
                   errs.push(e);
                   if (e.descriptor.stopOnError) {
                     throw new ValidationError(errs);
-                  } else if (e.descriptor.nextOnError) {
-                    continue;
                   }
+                  continue;
                 }
-                throw e;
               }
             }
             for (var attrib in childsValidate) {
