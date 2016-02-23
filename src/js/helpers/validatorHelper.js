@@ -3,7 +3,8 @@ import path from "path";
 import fs from "fs";
 import ValidatorConfiguration from "../validatorConfiguration";
 import ValidatorConfigError from "../exception/validatorConfigError";
-
+import ValidationError from "../exception/validationError";
+import ValidatorError from "../exception/validatorError";
 
 export default class ValidatorHelper {
 
@@ -90,7 +91,16 @@ export default class ValidatorHelper {
       }
       fctToCall.apply(this.caller, argsForFctToCall);
     });
-    targetClass.__validationOrder__.splice(description && description.index != undefined ? description.index : targetClass.__validationOrder__.length, 0, {key : description.propName, validatorIdx : targetClass.__validation__[description.propName].length - 1});
+
+    let groupIndex = description && description.groupIndex != undefined ? description.groupIndex : 0;
+
+    if (!targetClass.__validationOrder__[groupIndex]) {
+      targetClass.__validationOrder__[groupIndex] = [];
+    }
+
+    let indexIngroup = description && description.index != undefined ? description.index : targetClass.__validationOrder__[groupIndex].length;
+
+    targetClass.__validationOrder__[groupIndex].splice(indexIngroup, 0, {key : description.propName, validatorIdx : targetClass.__validation__[description.propName].length - 1});
   }
 
   /**
@@ -101,14 +111,43 @@ export default class ValidatorHelper {
   * @param {...extraParameters} extraParameters - complément de paramètres pour la fonction.
   */
   static applyValidatorOnFunction(descriptor, description, fctToCall, extraParameters) {
-    let oldFunct = descriptor.value;
-    descriptor.value = function() {
-      var argsForFctToCall = [arguments[description.index], description];
-      if (extraParameters) {
-        argsForFctToCall = argsForFctToCall.concat(extraParameters);
+
+    if (!descriptor.value.__validation__ && !descriptor.value.__validation__) {
+      let oldFunct = descriptor.value;
+      descriptor.value = function() {
+        let errs = [];
+        for (let index in descriptor.value.__validation__) {
+          let validatorDesc = descriptor.value.__validation__[index];
+          try {
+
+            var argsForFctToCall = [arguments[description.index], validatorDesc.description];
+            if (extraParameters) {
+              argsForFctToCall = argsForFctToCall.concat(extraParameters);
+            }
+            validatorDesc.validator.apply(this.caller, argsForFctToCall);
+          } catch (e) {
+              if (e instanceof ValidatorError && e.descriptor) {
+                errs.push(e);
+                if (e.descriptor.stopOnError) {
+                  throw new ValidationError(errs);
+                } else if (e.descriptor.nextOnError) {
+                  continue;
+                }
+              } else {
+                throw e;
+              }
+            }
+          }
+
+          if (errs && Array.isArray(errs) && errs.length > 0) {
+            throw new ValidationError(errs);
+          }
+          return descriptor.value.__oldFunct__.apply(this.caller, arguments);
+        };
+        descriptor.value.__oldFunct__ = oldFunct;
+        descriptor.value.__validation__ = [];
       }
-      fctToCall.apply(this.caller, argsForFctToCall);
-      return oldFunct.apply(this.caller, arguments);
-    };
-  }
+      descriptor.value.__validation__.push({description: description, validator : fctToCall});
+    }
+
 };

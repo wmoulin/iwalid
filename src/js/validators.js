@@ -60,8 +60,28 @@ function validateFct() {
                 childsValidate.push(attrib);
               }
             }
-            for(let idx = 0; idx < target.__validationOrder__.length; idx++) {
-              let validatorDesc = target.__validationOrder__[idx]
+            // on valide les groupes en premier
+            for(let idxGrp = 1; idxGrp < target.__validationOrder__.length; idxGrp++) {
+              for(let idx = 0; idx < target.__validationOrder__[idxGrp].length; idx++) {
+                let validatorDesc = target.__validationOrder__[idxGrp][idx]
+                try {
+                  target.__validation__[validatorDesc.key][validatorDesc.validatorIdx].bind(this)(this[validatorDesc.key]);
+                } catch (e) {
+                  if (e instanceof ValidatorError && e.descriptor) {
+                    errs.push(e);
+                    if (e.descriptor.stopOnError) {
+                      throw new ValidationError(errs);
+                    } else if (e.descriptor.nextOnError) {
+                      continue;
+                    }
+                  }
+                  throw e;
+                }
+              }
+            }
+            // on valide les non groupes ensuite
+            for(let idx = 0; idx < target.__validationOrder__[0].length; idx++) {
+              let validatorDesc = target.__validationOrder__[0][idx]
               try {
                 target.__validation__[validatorDesc.key][validatorDesc.validatorIdx].bind(this)(this[validatorDesc.key]);
               } catch (e) {
@@ -69,8 +89,9 @@ function validateFct() {
                   errs.push(e);
                   if (e.descriptor.stopOnError) {
                     throw new ValidationError(errs);
+                  } else if (e.descriptor.nextOnError) {
+                    continue;
                   }
-                  continue;
                 } else {
                   throw e;
                 }

@@ -8,10 +8,10 @@ import * as requiredValidators from "../../../src/js/validators/requiredValidato
 */
 @validateCallFct()
 export default class User {
-  @requiredValidators.required({index: 1, stopOnError: true})
+  @requiredValidators.required({stopOnError: true})
   name = "";
 
-  @requiredValidators.notEmpty({index: 0})
+  @requiredValidators.notEmpty({groupIndex: 1})
   password = "";
 
   constructor(name, password) {

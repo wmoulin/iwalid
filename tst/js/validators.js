@@ -6,6 +6,7 @@ import UserTer from "./userTer";
 import UserError from "./userError";
 import ValidatorConfigError from "../../src/js/exception/validatorConfigError";
 var assert = require("assert");
+import ValidationError from "../../src/js/exception/validationError";
 
 describe("Validation", function () {
   describe("User", function () {
@@ -22,7 +23,7 @@ describe("Validation", function () {
 
     it("user should be invalid", function () {
       var user = new User(undefined, "password");
-      assert.throws(() => user.validate(), Error);
+      assert.throws(() => user.validate(), ValidationError);
     });
   });
 
@@ -34,7 +35,7 @@ describe("Validation", function () {
 
     it("userBis should be invalid", function () {
       var user = new UserBis(undefined, "password");
-      assert.throws(() => user.validate(), Error);
+      assert.throws(() => user.validate(), ValidationError);
     });
   });
 
@@ -46,12 +47,12 @@ describe("Validation", function () {
 
     it("userTer should be invalid (required)", function () {
       var user = new UserTer(undefined, "password");
-      assert.throws(() => user.validate(), Error);
+      assert.throws(() => user.validate(), ValidationError);
     });
 
     it("userTer should be invalid (notEmpty)", function () {
       var user = new UserTer("name", "");
-      assert.throws(() => user.validate(), Error);
+      assert.throws(() => user.validate(), ValidationError);
     });
 
     it("userTer parameter should be valid", function () {
@@ -62,7 +63,7 @@ describe("Validation", function () {
 
     it("userTer parameter should be invalid", function () {
       var user = new UserTer("name", "password");
-      assert.throws(() => user.test(), Error);
+      assert.throws(() => user.test(), ValidationError);
     });
 
   });

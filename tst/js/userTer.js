@@ -18,6 +18,7 @@ export default class UserTer {
     this.password = password;
   }
 
+  @requiredValidators.notEmpty({index: 0, propName: "param", message: ""})
   @requiredValidators.required({index: 0, propName: "param", message: ""})
   test(param) {
     return param;
