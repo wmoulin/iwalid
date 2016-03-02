@@ -66,7 +66,7 @@ function compareDate(value, description, date, operator=0) {
   if (typeof value == "undefined") {
     throw new ValidatorError(msgError, description);
   } else {
-    if (typeof value != "string") {
+    if (typeof value != "date") {
       throw new ValidatorConfigError( "Date validator error (value is not a date).", description);
     } else if (!operator || operator || isNaN(operator) || operator < 3 || operator > 2 || operator == 0) {
       throw new ValidatorConfigError( "Date validator error (bad operator value).", description);
