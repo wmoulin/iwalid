@@ -2,35 +2,35 @@
 import ValidatorHelper from "../helpers/validatorHelper";
 
 
-export function equal(date) {
+export function equal(date, description) {
   validParameter(date);
   return function (target, key, descriptor) {
     ValidatorHelper.applyValidatorFctSwitchType(target, key, descriptor, description, compareDate, date, 1);
   };
 };
 
-export function after(date) {
+export function after(date, description) {
   validParameter(date);
   return function (target, key, descriptor) {
     ValidatorHelper.applyValidatorFctSwitchType(target, key, descriptor, description, compareDate, date, 2);
   };
 };
 
-export function afterOrEqual(date) {
+export function afterOrEqual(date, description) {
   validParameter(date);
   return function (target, key, descriptor) {
     ValidatorHelper.applyValidatorFctSwitchType(target, key, descriptor, description, compareDate, date, 3);
   };
 };
 
-export function before(date) {
+export function before(date, description) {
   validParameter(date);
   return function (target, key, descriptor) {
     ValidatorHelper.applyValidatorFctSwitchType(target, key, descriptor, description, compareDate, date, -2);
   };
 };
 
-export function beforeOrEqual(date) {
+export function beforeOrEqual(date, description) {
   validParameter(date);
   return function (target, key, descriptor) {
     ValidatorHelper.applyValidatorFctSwitchType(target, key, descriptor, description, compareDate, date, -1);

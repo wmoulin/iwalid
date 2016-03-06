@@ -2,35 +2,35 @@
 import ValidatorHelper from "../helpers/validatorHelper";
 
 
-export function equal(numberValue) {
+export function equal(numberValue, description) {
   validParameter(numberValue);
   return function (target, key, descriptor) {
     ValidatorHelper.applyValidatorFctSwitchType(target, key, descriptor, description, compareNumber, numberValue, 1);
   };
 };
 
-export function greater(numberValue) {
+export function greater(numberValue, description) {
   validParameter(numberValue);
   return function (target, key, descriptor) {
     ValidatorHelper.applyValidatorFctSwitchType(target, key, descriptor, description, compareNumber, numberValue, 2);
   };
 };
 
-export function greaterOrEqual(numberValue) {
+export function greaterOrEqual(numberValue, description) {
   validParameter(numberValue);
   return function (target, key, descriptor) {
     ValidatorHelper.applyValidatorFctSwitchType(target, key, descriptor, description, compareNumber, numberValue, 3);
   };
 };
 
-export function lower(numberValue) {
+export function lower(numberValue, description) {
   validParameter(numberValue);
   return function (target, key, descriptor) {
     ValidatorHelper.applyValidatorFctSwitchType(target, key, descriptor, description, compareNumber, numberValue, -2);
   };
 };
 
-export function lowerOrEqual(numberValue) {
+export function lowerOrEqual(numberValue, description) {
   validParameter(numberValue);
   return function (target, key, descriptor) {
     ValidatorHelper.applyValidatorFctSwitchType(target, key, descriptor, description, compareNumber, numberValue, -1);
