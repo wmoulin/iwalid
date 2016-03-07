@@ -8,7 +8,7 @@ L'application des validateurs sur les beans, peut se faire soit en utilisant des
 
 ## Principe de fonctionnement
 
-L'application du décorateur sur la classe permet d'ajouter la méthode `validate`, qui parcours l'ensemble des validations ajoutées. Cette méthode appelle soit les validateurs directement soit renvoit une promesse. Les erreurs de validation `ValidatorError` sont englobées dans une seul erreur `ValidationError`.
+L'application du décorateur sur la classe permet d'ajouter la méthode `validate`, qui parcours l'ensemble des validations ajoutées. Cette méthode appelle soit les validateurs directement soit renvoit un enchainemenet de promesses. Les erreurs de validation `ValidatorError` sont englobées dans une seul erreur `ValidationError`.
 
 ## Les validateurs
 
