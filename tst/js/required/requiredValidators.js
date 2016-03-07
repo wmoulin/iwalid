@@ -27,7 +27,7 @@ describe("Validation d'attribut obligatoire externalisée", function () {
       var confExt = JSON.parse(fs.readFileSync( __dirname + "/validators.json", 'utf8'));
       var user = new User("name", "password");
 
-      ValidatorLoader.applyExternalConfValidator(confExt, user);
+      ValidatorLoader.applyExternalConfValidator(confExt, user, true);
       assert.throws(() => user.validate(), Error);
       //assert.doesNotThrow(() => user.validate(), Error);// verif restaure validation
     });

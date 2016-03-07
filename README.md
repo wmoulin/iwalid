@@ -88,12 +88,14 @@ class UserTer {
 
 ### Configuration externe
 
-ValidatorLoader.applyExternalConfValidator(confExt, monBean);
+Pour pouvoir appliquer une configuration de validation sur un objet, il faut utliser la méthode `applyExternalConfValidator` (ValidatorLoader).
 
+Voici une exemple de configuration :
+
+```
 {
   "__validator__": {
     "modePromise": false,
-    "__instance__": ["required"],
     "__properties__" : {
       "name": ["required"],
       "password": [{"name": "notEmpty"}],
@@ -108,7 +110,15 @@ ValidatorLoader.applyExternalConfValidator(confExt, monBean);
     }
   }
 }
+```
+
+C'est l'attribut `__validator__` qui contient la déclaration des validation et qui déclenchera l'ajout potentiel de la méthode sur l'objet. `modePromise`, comme son nom l'indique, permet d'activer ou non la validation sous forme de promesses.
+
+ `__properties__` est un objet qui permet d'ajouter les différents validateur sur les propriétés de notre bean à valider. Chaque propriété de cette objet, correspond à une de notre bean, et à pour valeur une string (nom du décorateur) pour ajouter un seul validateur sans lui passer de paramètre ou un tableau d'objet avec une propriété `name` pour le nom du décorateur et une propriété `args` qui correspond au tableau d'arguments à passer au décorateur.
+
+  `__instance__` permet d'ajouter des validateurs sur une instance d'attribut à valider, comportant lui même d'autres attributs à aussi valider.
+
 
 ### Lancement de la validation
 
-monBean.validate()
+monBean.validate() qui suivant le mode est une méthode que exécute la validation directement ou qui retourne un enchainement de promesse.
