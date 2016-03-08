@@ -21,7 +21,7 @@ export default function match(description) {
 * {Object} description - description de la validation
 */
 function testPattern(value, description) {
-  let pattern = /[A-Z0-9._%+-]+@[A-Z0-9.-]+.[A-Z]{2,4}/igm;
+  let pattern = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}/igm;
   let msgError = description.message || "the value not match to the email pattern.";
   if (typeof value != "undefined") {
     if (typeof value != "string") {

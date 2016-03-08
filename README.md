@@ -14,13 +14,42 @@ L'application du décorateur sur la classe permet d'ajouter la méthode `validat
 
 ### Obligatoire
 
+Tous ces validateurs prennent q'un seul paramètre, un objet de configuration.
+
++ required : la valeur doit être définie.
++ notEmpty : ne s'applique qu'aux string et elle ne doivent pas être vides.
+
 ### Date
+
+Tous ces validateurs prennent deux paramètres, la date de référence et un objet de configuration
+
++ equal
++ after
++ afterOrEqual
++ before
++ beforeOrEqual
 
 ### Pattern
 
+Prend deux paramètres, le pattern et un objet de configuration
+
++ match
+
 ### Nombre
 
+Tous ces validateurs prennent deux paramètres, la nombre de référence et un objet de configuration
+
++ equal
++ greater
++ greaterOrEqual
++ lower
++ lowerOrEqual
+
 ### Email
+
+Prend q'un seul paramètre, un objet de configuration.
+
++ match : doit correspondre au pattern `[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}`
 
 ## Mise en oeuvre
 
