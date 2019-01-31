@@ -12,6 +12,6 @@
   },
   "main": "./src/js/iwalid.js",
   "devDependencies": {
-    "should": "^8.2.2"
+    "should": "^13.2.3"
   }
 }
